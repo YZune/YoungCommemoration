@@ -74,10 +74,10 @@
             <EditText
                 android:id="@+id/et_text"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="160dp"
                 android:background="@color/white"
                 android:gravity="top"
-                android:hint="写下值得纪念的事情…\n如果是生日类型的事件，只需填Ta名字就好啦，日期应该选Ta的出生日期哦~"
+                android:hint="写下值得纪念的事情…\n如果是生日类型的事件，只需填Ta名字就好啦，日期应该选Ta的出生日期哦~\n选择农历生日时，选择Ta的阳历生日即可，会自动转换哦~"
                 android:lineSpacingExtra="8dp"
                 android:maxLines="10"
                 android:padding="16dp"
@@ -97,36 +97,56 @@
                     android:text="类型"
                     android:textSize="16sp" />
 
-                <RadioGroup
-                    android:id="@+id/rg_choose_type"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
 
-                    <RadioButton
-                        android:id="@+id/rb_commemoration"
+                <HorizontalScrollView
+                    android:scrollbars="none"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <RadioGroup
+                        android:layout_gravity="center_vertical"
+                        android:id="@+id/rg_choose_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="16dp"
-                        android:buttonTint="@color/colorPrimary"
-                        android:text="纪念日" />
+                        android:orientation="horizontal">
 
-                    <RadioButton
-                        android:id="@+id/rb_birthday"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="16dp"
-                        android:buttonTint="@color/colorPrimary"
-                        android:text="生日" />
+                        <RadioButton
+                            android:id="@+id/rb_commemoration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="16dp"
+                            android:buttonTint="@color/colorPrimary"
+                            android:text="纪念日" />
 
-                    <RadioButton
-                        android:id="@+id/rb_rest"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="16dp"
-                        android:buttonTint="@color/colorPrimary"
-                        android:text="倒计时" />
-                </RadioGroup>
+                        <RadioButton
+                            android:id="@+id/rb_birthday"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="16dp"
+                            android:buttonTint="@color/colorPrimary"
+                            android:text="阳历生日" />
+
+                        <RadioButton
+                            android:id="@+id/rb_rest"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="16dp"
+                            android:buttonTint="@color/colorPrimary"
+                            android:text="倒计时" />
+
+                        <RadioButton
+                            android:id="@+id/rb_lunar_birthday"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="16dp"
+                            android:buttonTint="@color/colorPrimary"
+                            android:text="农历生日" />
+
+                    </RadioGroup>
+
+
+                </HorizontalScrollView>
+
 
             </LinearLayout>
 

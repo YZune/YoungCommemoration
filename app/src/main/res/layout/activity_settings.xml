@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.suda.yzune.youngcommemoration.view.SettingsActivity">
+
+    <RelativeLayout
+        android:id="@+id/rl_anim"
+        style="@style/setting_item">
+
+        <TextView
+            style="@style/setting_item_text"
+            android:text="过渡动画" />
+
+        <Switch
+            android:id="@+id/s_anim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:checked="true" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_below="@id/rl_anim"
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:background="@color/divider" />
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/rl_swap"
+        style="@style/setting_item"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            style="@style/setting_item_text"
+            android:text="滑动卡片以删除" />
+
+        <Switch
+            android:id="@+id/s_swipe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp" />
+
+    </RelativeLayout>
+
+    <View
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:background="@color/divider" />
+
+    <RelativeLayout
+        android:layout_marginTop="1px"
+        android:layout_below="@id/rl_anim"
+        android:id="@+id/rl_update"
+        style="@style/setting_item">
+
+        <TextView
+            style="@style/setting_item_text"
+            android:text="自动检查更新" />
+
+        <Switch
+            android:id="@+id/s_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:checked="true"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_below="@id/rl_update"
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:background="@color/divider" />
+
+    <RelativeLayout
+        android:layout_marginTop="1px"
+        android:layout_below="@id/rl_update"
+        android:id="@+id/rl_back"
+        style="@style/setting_item">
+
+        <TextView
+            style="@style/setting_item_text"
+            android:text="双击返回键退出编辑" />
+
+        <Switch
+            android:id="@+id/s_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:checked="true"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_marginRight="-64dp"
+        android:layout_marginBottom="-64dp"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:src="@drawable/ic_sheep"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

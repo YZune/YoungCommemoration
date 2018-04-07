@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.suda.yzune.youngcommemoration">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -22,6 +24,27 @@
         <activity
             android:name=".view.AddEventActivity"
             android:theme="@style/ShareElementAppTheme" />
+
+        <receiver android:name=".view.EventsWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/events_widget_info" />
+        </receiver>
+
+        <activity
+            android:name=".view.SettingsActivity"
+            android:label="设置" />
+
+        <activity android:name=".view.WidgetConfigActivity"
+            android:label="小部件设置">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

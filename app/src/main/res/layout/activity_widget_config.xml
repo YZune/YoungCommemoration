@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.suda.yzune.youngcommemoration.view.WidgetConfigActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="16dp"
+            android:text="请选择样式" />
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:scrollbars="none">
+
+            <RadioGroup
+                android:id="@+id/rg_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp">
+
+                <RadioButton
+                    android:id="@+id/rb_style_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/style0"
+                    android:gravity="center"
+                    android:text="带图片"
+                    android:textColor="@drawable/radiobutton_text" />
+
+                <RadioButton
+                    android:id="@+id/rb_style_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/style1"
+                    android:gravity="center"
+                    android:text="白底黑字1"
+                    android:textColor="@drawable/radiobutton_text" />
+
+                <RadioButton
+                    android:id="@+id/rb_style_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/style2"
+                    android:gravity="center"
+                    android:text="白底黑字2"
+                    android:textColor="@drawable/radiobutton_text" />
+
+                <RadioButton
+                    android:id="@+id/rb_style_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/style3"
+                    android:gravity="center"
+                    android:text="透明底白字"
+                    android:textColor="@drawable/radiobutton_text" />
+
+                <RadioButton
+                    android:id="@+id/rb_style_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/style2"
+                    android:gravity="center"
+                    android:text="透明底黑字"
+                    android:textColor="@drawable/radiobutton_text" />
+
+                <RadioButton
+                    android:id="@+id/rb_style_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/style5"
+                    android:gravity="center"
+                    android:text="带图片+模糊背景"
+                    android:textColor="@drawable/radiobutton_text" />
+
+                <RadioButton
+                    android:id="@+id/rb_style_6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/style6"
+                    android:gravity="center"
+                    android:text="模糊背景黑字"
+                    android:textColor="@drawable/radiobutton_text" />
+
+            </RadioGroup>
+
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/tv_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="24dp"
+            android:text="请输入自定义文字" />
+
+        <EditText
+            android:id="@+id/et_text"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@color/transparent"
+            android:gravity="center"
+            android:hint="写些什么好呢\n也可以留空啦"
+            android:lineSpacingExtra="8dp"
+            android:maxLines="10"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="24dp"
+            android:text="请选择事件" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</ScrollView>

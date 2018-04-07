@@ -6,39 +6,40 @@
 
     <android.support.v7.widget.CardView
         android:id="@+id/cv_event"
-        android:stateListAnimator="@animator/touch_raise"
-        android:foreground="?attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="120dp"
+        android:layout_marginBottom="12dp"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:layout_marginTop="24dp"
-        android:layout_marginBottom="12dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:stateListAnimator="@animator/touch_raise"
         app:cardCornerRadius="2dp">
 
         <ImageView
-            android:layout_marginLeft="80dp"
             android:id="@+id/iv_pic_bg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
+            android:layout_marginLeft="80dp"
             android:scaleType="centerCrop"
             android:src="@drawable/default_background" />
 
         <View
+            android:id="@+id/v_bg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
-            android:alpha="0.75"/>
+            android:alpha="0.75"
+            android:background="@color/white" />
 
         <ImageView
-            android:transitionName="image"
             android:id="@+id/iv_pic"
             android:layout_width="80dp"
             android:layout_height="120dp"
             android:layout_gravity="center_vertical"
             android:scaleType="centerCrop"
-            android:src="@drawable/default_background" />
+            android:src="@drawable/default_background"
+            android:transitionName="image" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,24 +50,25 @@
             android:orientation="vertical">
 
             <TextView
-                android:layout_gravity="center_horizontal"
                 android:id="@+id/tv_context"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:gravity="center_vertical"
+                android:marqueeRepeatLimit="marquee_forever"
                 android:maxLines="1"
-                android:textColor="@color/text_black"
                 android:text="「和你在一起」10000天"
+                android:textColor="@color/text_black"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/tv_date"
-                android:textSize="12sp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="从2018-02-03"/>
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:text="从2018-02-03"
+                android:textSize="12sp" />
 
         </LinearLayout>
 

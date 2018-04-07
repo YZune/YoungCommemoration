@@ -2,16 +2,13 @@ package com.suda.yzune.youngcommemoration.view;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.ContentResolver;
+import android.appwidget.AppWidgetManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -23,29 +20,45 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.RemoteViews;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.AppWidgetTarget;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.suda.yzune.youngcommemoration.GlideApp;
 import com.suda.yzune.youngcommemoration.R;
+import com.suda.yzune.youngcommemoration.bean.AppWidgetBean;
+import com.suda.yzune.youngcommemoration.bean.AppWidgetBeanDao;
+import com.suda.yzune.youngcommemoration.bean.DaoMaster;
+import com.suda.yzune.youngcommemoration.bean.DaoSession;
 import com.suda.yzune.youngcommemoration.bean.EventBean;
-import com.suda.yzune.youngcommemoration.utils.GetImageUtils;
-import com.suda.yzune.youngcommemoration.utils.ImageUtil;
+import com.suda.yzune.youngcommemoration.bean.Lunar;
+import com.suda.yzune.youngcommemoration.bean.Solar;
+import com.suda.yzune.youngcommemoration.utils.CountUtils;
+import com.suda.yzune.youngcommemoration.utils.DaoUtils;
+import com.suda.yzune.youngcommemoration.utils.GlideAppEngine;
+import com.suda.yzune.youngcommemoration.utils.LunarSolar;
 import com.suda.yzune.youngcommemoration.utils.SharedPreferencesUtils;
 import com.suda.yzune.youngcommemoration.utils.ViewUtil;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import es.dmoral.toasty.Toasty;
+import jp.wasabeef.glide.transformations.BlurTransformation;
+
+import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 public class AddEventActivity extends AppCompatActivity {
     int mYear, mMonth, mDay;
@@ -62,6 +75,7 @@ public class AddEventActivity extends AppCompatActivity {
     int choose_type = -1;
     final int DATE_DIALOG = 1;
     boolean is_fav;
+    private static final int REQUEST_CODE_CHOOSE = 23;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +136,9 @@ public class AddEventActivity extends AppCompatActivity {
                 case 2:
                     radioGroup.check(R.id.rb_rest);
                     break;
+                case 3:
+                    radioGroup.check(R.id.rb_lunar_birthday);
+                    break;
             }
         }
     }
@@ -155,10 +172,15 @@ public class AddEventActivity extends AppCompatActivity {
         iv_pic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        "image/*");
-                startActivityForResult(intent, GetImageUtils.PHOTO_PICK);
+                Matisse.from(AddEventActivity.this)
+                        .choose(MimeType.allOf())
+                        .countable(true)
+                        .maxSelectable(1)
+                        .gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
+                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                        .thumbnailScale(0.85f)
+                        .imageEngine(new GlideAppEngine())
+                        .forResult(REQUEST_CODE_CHOOSE);
             }
         });
 
@@ -188,6 +210,9 @@ public class AddEventActivity extends AppCompatActivity {
                         break;
                     case R.id.rb_rest:
                         choose_type = 2;
+                        break;
+                    case R.id.rb_lunar_birthday:
+                        choose_type = 3;
                         break;
                 }
             }
@@ -241,6 +266,49 @@ public class AddEventActivity extends AppCompatActivity {
                         eventBeanList.get(position).setType(choose_type);
                         eventBeanList.get(position).setPicture_path(pic_path);
                         eventBeanList.get(position).setFavourite(is_fav);
+
+                        DaoUtils.init(AddEventActivity.this);
+//                        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(getApplicationContext(), "appwidget.db", null);
+//                        DaoMaster daoMaster = new DaoMaster(devOpenHelper.getWritableDb());
+//                        DaoSession daoSession = daoMaster.newSession();
+//                        AppWidgetBeanDao widgetBeanDao = daoSession.getAppWidgetBeanDao();
+                        List<AppWidgetBean> w1 = DaoUtils.getWidgetInstance().daoSession.queryBuilder(AppWidgetBean.class).where(AppWidgetBeanDao.Properties.Position.eq(position)).list();
+
+                        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+                        for (AppWidgetBean w : w1) {
+                            w.setJson(gson.toJson(eventBeanList.get(position)));
+                            DaoUtils.getWidgetInstance().daoSession.update(w);
+                            //widgetBeanDao.update(w);
+                            RemoteViews views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.events_widget);
+                            switch (w.getStyle()) {
+                                case 0:
+                                    views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.events_widget);
+                                    break;
+                                case 1:
+                                    views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.events_widget_1);
+                                    break;
+                                case 2:
+                                    views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.events_widget_2);
+                                    break;
+                                case 3:
+                                    views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.events_widget_3);
+                                    break;
+                                case 4:
+                                    views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.events_widget_4);
+                                    break;
+                                case 5:
+                                    views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.events_widget_5);
+                                    break;
+                                case 6:
+                                    views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.events_widget_6);
+                                    break;
+                            }
+                            try {
+                                initWidget(getApplicationContext(), eventBeanList.get(position), views, w.getId().intValue(), w.getStyle(), w.getText(), appWidgetManager);
+                            } catch (ParseException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                         Toasty.success(AddEventActivity.this, "修改成功~").show();
                     }
                     String newJson = gson.toJson(eventBeanList);
@@ -251,20 +319,141 @@ public class AddEventActivity extends AppCompatActivity {
         });
     }
 
+    public void initWidget(Context context, EventBean e, RemoteViews views, int id, int style, String text, AppWidgetManager appWidgetManager) throws ParseException {
+        if (style == 0) {
+            Uri uri = Uri.parse(e.getPicture_path());
+            //views.setImageViewUri(R.id.iv_widget, uri);
+            AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, R.id.iv_widget, views, id);
+            GlideApp.with(context).asBitmap().load(uri).into(appWidgetTarget);
+        }
+
+        if (style == 5) {
+            Uri uri = Uri.parse(e.getPicture_path());
+            //views.setImageViewUri(R.id.iv_widget, uri);
+            AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, R.id.iv_widget, views, id);
+            AppWidgetTarget appWidgetTarget1 = new AppWidgetTarget(context, R.id.iv_pic_bg, views, id);
+            GlideApp.with(context).asBitmap().load(uri).into(appWidgetTarget);
+            GlideApp.with(context).asBitmap().load(uri).apply(bitmapTransform(new BlurTransformation(25))).into(appWidgetTarget1);
+        }
+
+        if (style == 6) {
+            Uri uri = Uri.parse(e.getPicture_path());
+            //views.setImageViewUri(R.id.iv_widget, uri);
+            AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, R.id.iv_pic_bg, views, id);
+            GlideApp.with(context).asBitmap().load(uri).apply(bitmapTransform(new BlurTransformation(25))).into(appWidgetTarget);
+        }
+
+        if (style == 0 || style == 1 || style == 5 || style == 6) {
+            switch (e.getType()) {
+                case 0:
+                    views.setTextViewText(R.id.tv_days_widget, CountUtils.daysBetween(context, e.getDate()) + "");
+                    views.setTextViewText(R.id.tv_event_widget, e.getContext());
+                    break;
+                case 1:
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String todayTime = sdf.format(new Date());
+                    int years = Integer.parseInt(todayTime.substring(0, 4)) - Integer.parseInt(e.getDate().substring(0, 4));
+                    int days = CountUtils.daysBetween(context, todayTime.substring(0, 4) + e.getDate().substring(4), 0);
+                    if (days < 0) {
+                        years += 1;
+                        days = CountUtils.daysBetween(context, String.valueOf(Integer.parseInt(todayTime.substring(0, 4)) + 1) + e.getDate().substring(4), 0);
+                    }
+                    views.setTextViewText(R.id.tv_event_widget, e.getContext() + years + "岁生日\n还有");
+                    views.setTextViewText(R.id.tv_days_widget, days + "");
+                    break;
+                case 2:
+                    days = CountUtils.daysBetween(context, e.getDate(), 0);
+                    if (days < 0) {
+                        views.setTextViewText(R.id.tv_event_widget, e.getContext() + "\n已过去");
+                        views.setTextViewText(R.id.tv_days_widget, (-days) + "");
+                    } else {
+                        views.setTextViewText(R.id.tv_event_widget, e.getContext() + "\n还有");
+                        views.setTextViewText(R.id.tv_days_widget, +days + "");
+                    }
+                    break;
+                case 3:
+                    sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    todayTime = sdf.format(new Date());
+                    Solar birth_solar = new Solar(e.getDate());
+
+                    Lunar birth_lunar = LunarSolar.SolarToLunar(birth_solar);
+                    Lunar now_lunar = LunarSolar.SolarToLunar(new Solar(todayTime));
+                    birth_lunar.setIsleap(false);
+                    birth_lunar.setLunarYear(now_lunar.getLunarYear());
+
+                    years = now_lunar.getLunarYear() - LunarSolar.SolarToLunar(birth_solar).getLunarYear();
+                    days = CountUtils.daysBetween(context, LunarSolar.LunarToSolar(birth_lunar).toString(), 0);
+                    if (days < 0) {
+                        years += 1;
+                        birth_lunar.setLunarYear(now_lunar.getLunarYear() + 1);
+                        days = CountUtils.daysBetween(context, LunarSolar.LunarToSolar(birth_lunar).toString(), 0);
+                    }
+                    views.setTextViewText(R.id.tv_event_widget, e.getContext() + years + "岁农历生日\n还有");
+                    views.setTextViewText(R.id.tv_days_widget, days + "");
+                    break;
+            }
+        }
+
+        if (style == 2 || style == 3 || style == 4) {
+            if (text.equals("")) {
+                views.setViewVisibility(R.id.tv_text, View.GONE);
+            } else {
+                views.setTextViewText(R.id.tv_text, text);
+            }
+            switch (e.getType()) {
+                case 0:
+                    views.setTextViewText(R.id.tv_event_widget, "「" + e.getContext() + "」" + CountUtils.daysBetween(context, e.getDate()) + "天");
+                    break;
+                case 1:
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String todayTime = sdf.format(new Date());
+                    int years = Integer.parseInt(todayTime.substring(0, 4)) - Integer.parseInt(e.getDate().substring(0, 4));
+                    int days = CountUtils.daysBetween(context, todayTime.substring(0, 4) + e.getDate().substring(4), 0);
+                    if (days < 0) {
+                        years += 1;
+                        days = CountUtils.daysBetween(context, String.valueOf(Integer.parseInt(todayTime.substring(0, 4)) + 1) + e.getDate().substring(4), 0);
+                    }
+                    views.setTextViewText(R.id.tv_event_widget, e.getContext() + years + "岁生日还有" + days + "天");
+                    break;
+                case 2:
+                    days = CountUtils.daysBetween(context, e.getDate(), 0);
+                    if (days < 0) {
+                        views.setTextViewText(R.id.tv_event_widget, e.getContext() + "已过去" + (-days) + "天");
+                    } else {
+                        views.setTextViewText(R.id.tv_event_widget, "离" + e.getContext() + "还有" + days + "天");
+                    }
+                    break;
+                case 3:
+                    sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    todayTime = sdf.format(new Date());
+                    Solar birth_solar = new Solar(e.getDate());
+
+                    Lunar birth_lunar = LunarSolar.SolarToLunar(birth_solar);
+                    Lunar now_lunar = LunarSolar.SolarToLunar(new Solar(todayTime));
+                    birth_lunar.setIsleap(false);
+                    birth_lunar.setLunarYear(now_lunar.getLunarYear());
+
+                    years = now_lunar.getLunarYear() - LunarSolar.SolarToLunar(birth_solar).getLunarYear();
+                    days = CountUtils.daysBetween(context, LunarSolar.LunarToSolar(birth_lunar).toString(), 0);
+                    if (days < 0) {
+                        years += 1;
+                        birth_lunar.setLunarYear(now_lunar.getLunarYear() + 1);
+                        days = CountUtils.daysBetween(context, LunarSolar.LunarToSolar(birth_lunar).toString(), 0);
+                    }
+                    views.setTextViewText(R.id.tv_event_widget, e.getContext() + years + "岁农历生日还有" + days + "天");
+                    break;
+            }
+        }
+        appWidgetManager.updateAppWidget(id, views);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case GetImageUtils.PHOTO_PICK:
-                if (null != data) {
-                    Uri uri = Uri.parse(data.getDataString());
-                    Glide.with(this).load(uri).into(iv_pic);
-                    pic_path = uri.toString();
-                }
-                break;
-
-            default:
-                break;
+        if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
+            Uri uri = Uri.parse(Matisse.obtainResult(data).get(0).toString());
+            Glide.with(this).load(uri).into(iv_pic);
+            pic_path = uri.toString();
         }
     }
 
@@ -298,8 +487,11 @@ public class AddEventActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && SharedPreferencesUtils.getBooleanFromSP(AddEventActivity.this, "s_back", true)) {
             exitBy2Click();  //退出应用的操作
+        }
+        if (keyCode == KeyEvent.KEYCODE_BACK && !SharedPreferencesUtils.getBooleanFromSP(AddEventActivity.this, "s_back", true)) {
+            finish();
         }
         return false;
     }
@@ -322,7 +514,6 @@ public class AddEventActivity extends AppCompatActivity {
                 }
             }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
         } else {
-
             finish();
         }
     }
