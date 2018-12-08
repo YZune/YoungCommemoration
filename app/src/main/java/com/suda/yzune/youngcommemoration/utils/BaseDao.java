@@ -243,7 +243,7 @@ public class BaseDao<T> {
 
     /***************************关闭数据库*************************/
     /**
-     * 关闭数据库一般在Odestory中使用
+     * 关闭数据库一般在Ondestory中使用
      */
     public void CloseDataBase() {
         manager.closeDataBase();
